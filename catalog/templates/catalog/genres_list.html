@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-light mb-4">Genres</h2>
+    <div class="row g-4">
+        {% for genre in genres %}
+        <div class="col-md-3 mb-4">
+            <div class="card p-0 h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ genre.name }}</h5>
+                    <p class="card-text">Books: {{ genre.book_set.count }}</p>
+                    <a href="{% url 'catalog:books_by_genre' genre.pk %}" class="btn btn-custom btn-gradient">View Books</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-light">No genres found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

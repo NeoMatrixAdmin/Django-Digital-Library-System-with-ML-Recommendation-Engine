@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+<style>
+/* Basic dashboard-specific tweaks, matching your style */
+.kpi-row { display:flex; gap:20px; margin-bottom:24px; }
+.kpi-card { flex:1; padding:18px; border-radius:16px; background: linear-gradient(180deg, rgba(30,30,30,0.9), rgba(20,20,20,0.9)); box-shadow: 0 8px 30px rgba(0,0,0,0.6); color:white; }
+.kpi-number { font-size:1.8rem; font-weight:700; background: linear-gradient(90deg,#8e2de2,#ff0057,#1DB954); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.card-analytics { border-radius:20px; padding:18px; background: rgba(20,20,20,0.9); margin-bottom:18px; }
+.chart-canvas { width:100%; height:360px; }
+.static-chart { width:100%; max-height:420px; object-fit:contain; border-radius:12px; box-shadow: inset 0 0 40px rgba(0,0,0,0.6); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+
+    <!-- KPI Row -->
+    <div class="kpi-row">
+        <div class="kpi-card">
+            <div>Total Books</div>
+            <div class="kpi-number">{{ total_books }}</div>
+        </div>
+        <div class="kpi-card">
+            <div>Total Authors</div>
+            <div class="kpi-number">{{ total_authors }}</div>
+        </div>
+        <div class="kpi-card">
+            <div>Total Genres</div>
+            <div class="kpi-number">{{ total_genres }}</div>
+        </div>
+        <div class="kpi-card">
+            <div>Available Copies</div>
+            <div class="kpi-number">{{ total_available }}</div>
+        </div>
+        <div class="kpi-card">
+            <div>Borrowed Copies</div>
+            <div class="kpi-number">{{ total_borrowed }}</div>
+        </div>
+    </div>
+
+    <!-- Interactive Genre (full width) -->
+    <div class="card-analytics mb-4">
+        <h3 style="background: linear-gradient(90deg,#8e2de2,#ff0057); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Books by Genre (Interactive)</h3>
+        <canvas id="genreChart" class="chart-canvas"></canvas>
+    </div>
+
+    <!-- Row: Left = Borrowed per month, Right = Available vs Borrowed -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-8">
+            <div class="card-analytics">
+                <h4 style="background: linear-gradient(90deg,#8e2de2,#ff0057); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Borrowed per Month</h4>
+                <canvas id="borrowedMonthChart" class="chart-canvas"></canvas>
+                {% if borrowed_month_chart_url %}
+                    <p class="text-muted small mt-2">Static summary (backend): <img src="{{ borrowed_month_chart_url }}" class="static-chart" alt="Borrowed per month"></p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-analytics">
+                <h4 style="background: linear-gradient(90deg,#8e2de2,#ff0057); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Available vs Borrowed</h4>
+                <canvas id="availChart" class="chart-canvas"></canvas>
+                {% if avail_chart_url %}
+                    <p class="text-muted small mt-2">Static summary: <img src="{{ avail_chart_url }}" class="static-chart" alt="Avail vs Borrowed"></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Row: Authors (interactive + static) and Top 5 static Genres -->
+    <div class="row g-4">
+        <div class="col-md-8">
+            <div class="card-analytics">
+                <h4 style="background: linear-gradient(90deg,#8e2de2,#ff0057); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Top Authors (Interactive)</h4>
+                <canvas id="authorChart" class="chart-canvas"></canvas>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-analytics">
+                <h4 style="background: linear-gradient(90deg,#8e2de2,#ff0057); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Top 5 Genres (Static)</h4>
+                {% if genre_chart_url %}
+                    <img src="{{ genre_chart_url }}" alt="Top 5 Genres" class="static-chart">
+                {% else %}
+                    <p class="text-light small">Not enough data for static summary.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+/* Genre Chart */
+const genreLabels = {{ genre_labels|safe }};
+const genreValues = {{ genre_values|safe }};
+const ctxGenre = document.getElementById('genreChart').getContext('2d');
+new Chart(ctxGenre, {
+    type: 'bar',
+    data: {
+        labels: genreLabels,
+        datasets: [{
+            label: 'Books',
+            data: genreValues,
+            borderWidth: 2,
+            backgroundColor: genreLabels.map((l,i)=>['rgba(142,45,226,0.9)','rgba(74,0,224,0.9)','rgba(255,0,87,0.9)','rgba(29,185,84,0.9)'][i % 4]),
+            borderColor: genreLabels.map((l,i)=>['rgba(142,45,226,1)','rgba(74,0,224,1)','rgba(255,0,87,1)','rgba(29,185,84,1)'][i % 4]),
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display:false } },
+        scales: {
+            x: { ticks: { color: 'white' } },
+            y: { ticks: { color: 'white' } }
+        }
+    }
+});
+
+/* Author Chart */
+const authorLabels = {{ author_labels|safe }};
+const authorValues = {{ author_values|safe }};
+const ctxAuthor = document.getElementById('authorChart').getContext('2d');
+new Chart(ctxAuthor, {
+    type: 'bar',
+    data: {
+        labels: authorLabels,
+        datasets: [{ label: 'Books', data: authorValues, borderWidth:1 }]
+    },
+    options: { indexAxis:'y', responsive:true, plugins:{ legend:{display:false} }, scales:{ x:{ticks:{color:'white'}}, y:{ticks:{color:'white'}} } }
+});
+
+/* Available vs Borrowed */
+const availLabels = {{ avail_labels|safe }};
+const availValues = {{ avail_values|safe }};
+const ctxAvail = document.getElementById('availChart').getContext('2d');
+new Chart(ctxAvail, {
+    type: 'doughnut',
+    data: {
+        labels: availLabels,
+        datasets: [{ data: availValues, backgroundColor:['rgba(29,185,84,0.9)','rgba(255,0,87,0.9)'] }]
+    },
+    options: { responsive:true, plugins:{ legend:{ labels:{ color:'white' } } } }
+});
+
+/* Borrowed per month */
+const borrowedMonthLabels = {{ borrowed_month_labels|safe }};
+const borrowedMonthValues = {{ borrowed_month_values|safe }};
+const ctxBorrowed = document.getElementById('borrowedMonthChart').getContext('2d');
+new Chart(ctxBorrowed, {
+    type: 'line',
+    data: {
+        labels: borrowedMonthLabels,
+        datasets: [{ label:'Borrows', data: borrowedMonthValues, tension:0.3, borderWidth:2 }]
+    },
+    options: { responsive:true, scales:{ x:{ ticks:{ color:'white' } }, y:{ ticks:{ color:'white' } } } }
+});
+</script>
+{% endblock %}

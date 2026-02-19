@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load socialaccount %}   <!-- REQUIRED -->
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card shadow-lg p-4" style="width: 400px; border-radius: 20px;">
+        <h2 class="text-center mb-3">Create Account</h2>
+        <p class="text-center mb-4">Join MyLibrary today</p>
+
+        <!-- NORMAL SIGNUP FORM -->
+        <form method="post" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <button class="btn btn-success w-100 mt-2">Sign Up</button>
+        </form>
+
+        <!-- DIVIDER -->
+        <div class="text-center mt-3 mb-2">
+            <span style="font-size: 12px; color: #888;">OR</span>
+        </div>
+
+        <!-- GOOGLE SIGNUP BUTTON -->
+        <a href="{% provider_login_url 'google' %}" class="btn w-100"
+           style="background:#fff; border:1px solid #ddd; border-radius:8px;
+                  display:flex; align-items:center; justify-content:center;
+                  gap:10px; padding:8px 0;">
+
+            <img src="https://developers.google.com/identity/images/g-logo.png"
+                 style="width:18px; height:18px;" alt="Google">
+
+            <span style="font-weight:500;">Continue with Google</span>
+        </a>
+
+        <!-- LOGIN LINK -->
+        <div class="text-center mt-3">
+            <small>Already have an account?
+                <a href="{% url 'account_login' %}">Login</a>
+            </small>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

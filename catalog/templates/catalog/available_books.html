@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Available Books{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-light mb-4">Available Books</h2>
+    <div class="row">
+        {% for book, available_instance in books_with_available_instance %}
+        <div class="col-md-4 mb-4">
+            <div class="card bg-dark text-light h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text">Author: {{ book.author }}</p>
+                    <p class="card-text">Genre:
+                        {% for genre in book.genre.all %}
+                            {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            None
+                        {% endfor %}
+                    </p>
+
+                    <!-- Landing page-style buttons -->
+                    <a href="{% url 'catalog:book-detail' book.pk %}" class="btn btn-green btn-custom">View Details</a>
+
+
+                    {% if available_instance %}
+                        <a href="{% url 'catalog:borrow_book' available_instance.pk %}" class="btn btn-green btn-custom mt-2">Borrow</a>
+                    {% else %}
+                        <span class="badge bg-secondary mt-2">Not Available</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-light">No books available.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

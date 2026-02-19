@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-light mb-4">All Books</h2>
+    <div class="row g-4">
+        {% for book in books %}
+        <div class="col-md-4 mb-4">
+            <div class="card p-0 h-100" style="background: rgba(30,30,30,0.9); border-radius: 20px; box-shadow: 0px 8px 40px rgba(0,0,0,0.5); transition: transform 0.3s, box-shadow 0.3s;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text">Author: {{ book.author }}</p>
+                    <p class="card-text">Genre: 
+                        {% for genre in book.genre.all %}
+                            {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                    <!-- Landing page style button -->
+                    <a href="{% url 'catalog:book-detail' book.pk %}"
+                       class="btn btn-custom btn-gradient mt-3" 
+                       style="padding: 12px 18px; border-radius: 50px; font-weight: 600; transition: transform 0.2s, box-shadow 0.2s;">
+                       View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-light">No books available.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

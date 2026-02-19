@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-light mb-4">Borrowed Books</h2>
+    <div class="row g-4">
+        {% for book in books %}
+        <div class="col-md-4">
+            <div class="card bg-dark text-light h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ book.book.title }}</h5>
+                    <p class="card-text">Author: {{ book.book.author }}</p>
+                    <p class="card-text">Genre: 
+                        {% for genre in book.book.genre.all %}
+                            {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                    <p class="card-text">Due: {{ book.due_back }}</p>
+                    <a href="{% url 'book-detail' book.book.pk %}" class="btn btn-gradient btn-custom mt-2">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-light">You have no borrowed books.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book Details{% endblock %}
+
+{% block content %}
+
+<!-- ========================================= -->
+<!--  BOOK INFO CARD                          -->
+<!-- ========================================= -->
+<div class="card p-4 mb-4"
+     style="background: rgba(15,15,15,0.95); border-radius: 20px; box-shadow: 0px 10px 40px rgba(0,0,0,0.5);">
+
+    <h2 class="fw-bold"
+        style="background: linear-gradient(90deg, #8e2de2, #4a00e0, #ff0057, #00ffb0);
+               -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        {{ object.title }}
+    </h2>
+
+    <p><strong>Author:</strong> {{ object.author }}</p>
+    <p><strong>Internal ISBN:</strong> {{ object.isbn }}</p>
+
+    {% if object.real_isbn %}
+        <p><strong>Real ISBN:</strong> {{ object.real_isbn }}</p>
+    {% else %}
+        <p><strong>Real ISBN:</strong> <span class="text-warning">Not yet scraped</span></p>
+    {% endif %}
+
+    <p><strong>Language:</strong> {{ object.language }}</p>
+
+    <p class="mt-3"><strong>Genres:</strong></p>
+    {% for g in object.genre.all %}
+        <span class="badge bg-info text-dark">{{ g.name }}</span>
+    {% endfor %}
+
+    <p class="mt-4"><strong>Summary:</strong></p>
+    <p>{{ object.summary }}</p>
+</div>
+{% load json_extras %}
+
+{% if preview %}
+<div class="card mt-5"
+     style="background: rgba(25,25,25,0.9); border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.6);">
+    <div class="card-body">
+
+        <!-- SECTION HEADER -->
+        <h3 class="mb-4"
+            style="background: linear-gradient(90deg,#8e2de2,#ff0057);
+                   -webkit-background-clip: text;
+                   -webkit-text-fill-color: transparent;">
+            AI-Enhanced Metadata
+        </h3>
+
+        <!-- TAGS -->
+        <div class="mb-3">
+            {% for tag in preview.tags %}
+                <span style="background: linear-gradient(90deg,#8e2de2,#ff0057);
+                             color:white; padding:6px 14px;
+                             border-radius:12px; margin-right:6px; font-size:13px;">
+                    {{ tag }}
+                </span>
+            {% endfor %}
+        </div>
+
+        <!-- READING LEVEL -->
+        <div class="mt-2 mb-4">
+            <span class="badge"
+                  style="background:#1DB954; padding:8px 16px; border-radius:20px;">
+                Reading Level: {{ preview.reading_level }}
+            </span>
+        </div>
+
+        <!-- IMPROVED SUMMARY -->
+        <h5 class="mt-4">Improved Summary</h5>
+        <p style="color:rgba(255,255,255,0.75); line-height:1.6;">
+            {{ preview.summary }}
+        </p>
+
+        <!-- SIMILAR BOOKS -->
+        <h5 class="mt-4">Similar Books (AI Suggestions)</h5>
+        {% for rec in preview.recommendations|json_loads %}
+            <div class="mt-3 p-3"
+                 style="background: rgba(40,40,40,0.6);
+                        border-radius: 15px;
+                        box-shadow: 0px 4px 16px rgba(0,0,0,0.5);">
+                <strong>{{ rec.title }}</strong>
+                <p class="mt-1" style="color: rgba(255,255,255,0.7); font-size: 14px;">
+                    {{ rec.reason }}
+                </p>
+            </div>
+        {% endfor %}
+
+    </div>
+</div>
+{% else %}
+<div class="alert alert-warning mt-4">
+    No AI metadata available yet.
+</div>
+{% endif %}
+
+
+
+<!-- ====================================================== -->
+<!--  ⭐ HYBRID PREVIEW CARD (OPENLIBRARY + OPENAI SUMMARY) -->
+<!-- ====================================================== -->
+<div class="card p-4 mb-5"
+     style="background: rgba(20,20,20,0.92); border-radius: 22px;
+            box-shadow: 0px 10px 40px rgba(0,0,0,0.6);">
+
+    <h3 class="fw-bold mb-3"
+        style="background: linear-gradient(90deg, #ff0080, #7928ca, #2afadf);
+               -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        🔮 Smart Book Preview
+    </h3>
+
+    <!-- ==================== -->
+    <!-- AI MINI-SUMMARY BOX -->
+    <!-- ==================== -->
+    <div class="p-3 mb-4"
+         style="
+            background: rgba(34,34,34,0.95);
+            border-left: 4px solid #8e2de2;
+            border-radius: 12px;
+         ">
+
+        <h5 class="fw-bold mb-2" style="color:#c79bff;">✨ AI Insight</h5>
+
+        {% if object.ai_preview %}
+            <p style="color:#ddd;">{{ object.ai_preview }}</p>
+        {% else %}
+            <p class="text-muted">
+                No AI preview generated yet — once you enable OpenAI preview generation, 
+                this area will show a short 2–3 sentence summary of the book written by the model.
+            </p>
+        {% endif %}
+    </div>
+
+
+
+    <!-- ============================== -->
+    <!-- COLLAPSIBLE PREVIEW READER UI -->
+    <!-- ============================== -->
+    <button class="btn btn-outline-info mb-3"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#previewBox"
+            aria-expanded="false"
+            style="border-radius:12px;">
+        📖 Show Full Preview
+    </button>
+
+    <div class="collapse" id="previewBox">
+
+    {% if object.ol_work_id %}
+    <iframe 
+        src="https://openlibrary.org/works/{{ object.ol_work_id }}/preview"
+        style="
+            width: 100%;
+            height: 650px;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0px 4px 30px rgba(0,0,0,0.6);
+            background: #000;
+        "
+        allowfullscreen>
+    </iframe>
+    {% else %}
+    <div class="p-3 text-center"
+        style="background: rgba(40,40,40,0.8); border-radius: 15px;">
+        <p class="text-warning mb-0">
+            No Work-ID available — cannot load OpenLibrary preview.
+        </p>
+    </div>
+    {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

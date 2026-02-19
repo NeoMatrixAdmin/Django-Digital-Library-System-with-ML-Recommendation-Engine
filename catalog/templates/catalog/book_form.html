@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Book{% endblock %}
+
+{% block content %}
+<div class="card p-4 shadow-sm">
+    <h3 class="mb-3">Add New Book</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button class="btn btn-success mt-3">Save Book</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Home</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #0d0d0d;
+            min-height: 100vh;
+            color: white;
+            font-family: "Poppins", sans-serif;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 120px 20px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #8e2de2, #4a00e0, #ff0057, #00ffb0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .card {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0px 8px 40px rgba(0, 0, 0, 0.5);
+            background: rgba(30, 30, 30, 0.9);
+            color: white;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0px 12px 50px rgba(0, 0, 0, 0.7);
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .btn-custom {
+            padding: 12px 18px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: white;
+            border: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-custom:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-green {
+            background: #1DB954;
+        }
+
+        .btn-green:hover {
+            box-shadow: 0px 4px 20px rgba(29, 185, 84, 0.6);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(90deg, #8e2de2, #4a00e0, #ff0057, #00ffb0);
+        }
+
+        .btn-gradient:hover {
+            box-shadow: 0px 4px 20px rgba(0, 255, 176, 0.6);
+        }
+
+        .footer {
+            margin-top: 80px;
+            text-align: center;
+            color: rgba(255,255,255,0.6);
+            padding: 20px;
+        }
+
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark px-4 py-3 fixed-top">
+    <a class="navbar-brand fw-bold" href="{% url 'catalog:index' %}">MyLibrary</a>
+    <div class="ms-auto">
+        {% if user.is_authenticated %}
+            <a href="{% url 'catalog:my_books' %}" class="btn btn-outline-light btn-sm me-2">My Books</a>
+            <a href="{% url 'account_logout' %}" class="btn btn-danger btn-sm">Logout</a>
+        {% else %}
+            <a href="{% url 'account_login' %}" class="btn btn-outline-light btn-sm me-2">Login</a>
+            <a href="{% url 'account_signup' %}" class="btn btn-success btn-sm">Signup</a>
+        {% endif %}
+    </div>
+</nav>
+
+<section class="hero mt-5 pt-5">
+    <h1>Welcome to MyLibrary</h1>
+    <p>Explore books, manage your collection, and check out your favorites — all in one place.</p>
+</section>
+
+<div class="container my-5">
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card p-0 h-100">
+                <div class="card-body text-center">
+                    <h3>Create a Book</h3>
+                    <p>Add new titles to the library collection.</p>
+                    <a href="{% url 'catalog:create_book' %}" class="btn btn-custom btn-green">Create Book</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-0 h-100">
+                <div class="card-body text-center">
+                    <h3>View Your Books</h3>
+                    <p>See all the books you have currently checked out.</p>
+                    <a href="{% url 'catalog:my_books' %}" class="btn btn-custom btn-green">My Books</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-0 h-100">
+                <div class="card-body text-center">
+                    <h3>All Books</h3>
+                    <p>Browse the complete library collection.</p>
+                    <a href="{% url 'catalog:all_books' %}" class="btn btn-custom btn-green">View All</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="footer">
+    © 2025 MyLibrary — Built with Grit, Discipline and a whole lotta magic.
+</div>
+
+</body>
+</html>

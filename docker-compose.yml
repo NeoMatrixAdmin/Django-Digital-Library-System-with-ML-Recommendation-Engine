@@ -1,0 +1,51 @@
+
+
+services:
+  web:
+    env_file:
+    - .env
+
+    build: .
+    container_name: library-web
+    command: gunicorn library.wsgi:application --bind 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    environment:
+      OPENAI_API_KEY: "${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}"
+      # Postgres connection (Django will read this)
+      POSTGRES_DB: library_db
+      POSTGRES_USER: library_user
+      POSTGRES_PASSWORD: library_pass
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+
+      # Selenium Remote URL for scraping (Phase 4)
+      SELENIUM_REMOTE_URL: http://selenium:4444/wd/hub
+
+    depends_on:
+      - db
+      - selenium
+
+    volumes:
+      - .:/app
+
+  db:
+    image: postgres:15
+    container_name: library-db
+    environment:
+      POSTGRES_DB: library_db
+      POSTGRES_USER: library_user
+      POSTGRES_PASSWORD: library_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # PHASE 4 — Selenium Chrome browser
+  selenium:
+    image: selenium/standalone-chrome:latest
+    container_name: library-selenium
+    shm_size: "2gb"  # prevents chrome crashes
+    ports:
+      - "4444:4444"
+
+volumes:
+  postgres_data:
