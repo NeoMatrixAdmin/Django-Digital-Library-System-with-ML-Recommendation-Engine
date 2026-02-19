@@ -1,75 +1,54 @@
-Django Digital Library System with ML Recommendation Engine
-Overview
+# Django Digital Library System with ML Recommendation Engine
+
+## Overview
 
 A production-oriented Digital Library System built using Django and PostgreSQL, enhanced with AI-powered book preview generation and a semantic recommendation engine based on vector embeddings.
 
 This project demonstrates backend system design, relational database modeling, AI integration, and containerized deployment using Docker.
 
-Features
+---
 
-Book catalog management (CRUD operations)
+## Features
 
-PostgreSQL relational database design
+- Book catalog management (CRUD operations)
+- PostgreSQL relational database integration
+- Book borrowing and tracking system
+- AI-generated book previews
+- Semantic search using embeddings
+- ML-based recommendation engine
+- Admin dashboard
+- Docker and Docker Compose setup
+- Secure API key handling using environment variables
 
-Book borrowing and tracking system
+---
 
-AI-generated book previews
+## Tech Stack
 
-Semantic search using embeddings
+### Backend
+- Python
+- Django
 
-ML-based recommendation engine
+### Database
+- PostgreSQL
 
-Admin dashboard
+### AI / Machine Learning
+- OpenAI API (embeddings and preview generation)
+- Groq API (LLM inference)
 
-Docker and Docker Compose configuration
+### DevOps
+- Docker
+- Docker Compose
 
-Secure API key management using environment variables
+---
 
-Tech Stack
-Backend
+## Recommendation Engine Design
 
-Python
+1. Book descriptions are converted into vector embeddings.
+2. Embeddings are stored in the database.
+3. User queries are embedded using the same model.
+4. Cosine similarity is computed between vectors.
+5. Top-N most similar books are returned as recommendations.
 
-Django
+This enables semantic similarity matching instead of keyword-based filtering.
 
-Database
-
-PostgreSQL
-
-AI / ML
-
-OpenAI API (embeddings and preview generation)
-
-Groq API (LLM inference)
-
-DevOps
-
-Docker
-
-Docker Compose
-
-Recommendation Engine Logic
-
-Book descriptions are converted into vector embeddings.
-
-Embeddings are stored in the database.
-
-User queries are embedded using the same model.
-
-Cosine similarity is calculated between vectors.
-
-Top-N most similar books are returned as recommendations.
-
-This enables semantic similarity matching rather than simple keyword-based filtering.
-
-Future Improvements
-
-Add user authentication and role-based access
-
-Convert to REST API using Django REST Framework
-
-Add frontend using React
-
-Deploy to AWS / Render
-
-Add automated testing and CI/CD pipeline
+---
